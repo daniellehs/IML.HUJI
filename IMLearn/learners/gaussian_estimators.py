@@ -1,4 +1,7 @@
 from __future__ import annotations
+
+import math
+
 import numpy as np
 from numpy.linalg import inv, det, slogdet
 
@@ -27,11 +30,12 @@ class UnivariateGaussian:
             function.
 
         var_: float
-            Estimated variance initialized as None. To be set in `UnivariateGaussian.fit`
+            Estimated variance initialized as None. של  To be set in `UnivariateGaussian.fit`
             function.
         """
         self.biased_ = biased_var
         self.fitted_, self.mu_, self.var_ = False, None, None
+
 
     def fit(self, X: np.ndarray) -> UnivariateGaussian:
         """
@@ -51,7 +55,12 @@ class UnivariateGaussian:
         Sets `self.mu_`, `self.var_` attributes according to calculated estimation (where
         estimator is either biased or unbiased). Then sets `self.fitted_` attribute to `True`
         """
-        raise NotImplementedError()
+        if self.biased_:
+            biased = 1
+        else:
+            biased = 0
+        self.mu_ = np.mean(X)
+        self.var_ = np.var(X)
 
         self.fitted_ = True
         return self
@@ -76,7 +85,7 @@ class UnivariateGaussian:
         """
         if not self.fitted_:
             raise ValueError("Estimator must first be fitted before calling `pdf` function")
-        raise NotImplementedError()
+        return np.exp((-(X - self.mu_) ** 2) / 2 * self.var_) / math.sqrt(self.var_ * 2 * math.pi)
 
     @staticmethod
     def log_likelihood(mu: float, sigma: float, X: np.ndarray) -> float:
